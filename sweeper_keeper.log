@@ -1,0 +1,16 @@
+2024-10-13 17:01:30,059 - INFO - Starting SweeperKeeper
+2024-10-13 17:01:30,059 - INFO - Initializing database
+2024-10-13 17:01:30,124 - INFO - Locating social casinos
+2024-10-13 17:01:31,256 - INFO - Found 2 verified social casinos
+2024-10-13 17:01:31,271 - INFO - Stored information for 2 casinos
+2024-10-13 17:01:31,272 - INFO - Starting multi-threaded coin claiming test
+2024-10-13 17:01:31,272 - INFO - Multi-threaded coin claiming test results: []
+2024-10-13 17:01:31,273 - INFO - Scheduled daily coin claiming for all accounts
+2024-10-13 17:03:40,937 - INFO - Starting SweeperKeeper
+2024-10-13 17:03:40,938 - INFO - Initializing database
+2024-10-13 17:03:40,938 - INFO - Locating social casinos
+2024-10-13 17:03:42,287 - INFO - Found 2 verified social casinos
+2024-10-13 17:03:42,337 - INFO - Stored information for 2 casinos
+2024-10-13 17:03:42,338 - INFO - Starting multi-threaded coin claiming test
+2024-10-13 17:03:42,338 - INFO - Multi-threaded coin claiming test results: []
+2024-10-13 17:03:42,338 - INFO - Scheduled daily coin claiming for all accounts

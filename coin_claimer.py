@@ -33,7 +33,9 @@ class CoinClaimer:
             return False
 
     def claim_coins_for_all_accounts(self, max_workers=5):
+        logging.info("Starting claim_coins_for_all_accounts method")
         accounts = get_accounts(self.db)
+        logging.info(f"Found {len(accounts)} accounts to process")
         results = []
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -42,11 +44,13 @@ class CoinClaimer:
                 account = future_to_account[future]
                 try:
                     result = future.result()
+                    logging.info(f"Coin claiming for account {account[0]} completed with result: {result}")
                     results.append((account[0], result))
                 except Exception as exc:
                     logging.error(f"Account {account[0]} generated an exception: {exc}")
                     results.append((account[0], False))
 
+        logging.info(f"claim_coins_for_all_accounts completed. Results: {results}")
         return results
 
     def get_session(self):
@@ -55,26 +59,31 @@ class CoinClaimer:
         return self.thread_local.session
 
     def claim_chumba_casino(self, account):
+        logging.info(f"Claiming coins for Chumba Casino account: {account['id']}")
         return self._generic_claim(account, "https://www.chumbacasino.com/claim-coins", 
                                    login_selector="#login-form", 
                                    claim_selector="#claim-coins-button")
 
     def claim_luckyland_slots(self, account):
+        logging.info(f"Claiming coins for LuckyLand Slots account: {account['id']}")
         return self._generic_claim(account, "https://www.luckylandslots.com/claim-coins", 
                                    login_selector="#login-form", 
                                    claim_selector="#claim-coins-button")
 
     def claim_global_poker(self, account):
+        logging.info(f"Claiming coins for Global Poker account: {account['id']}")
         return self._generic_claim(account, "https://www.globalpoker.com/claim-coins", 
                                    login_selector="#login-form", 
                                    claim_selector="#claim-coins-button")
 
     def claim_funzpoints(self, account):
+        logging.info(f"Claiming coins for Funzpoints account: {account['id']}")
         return self._generic_claim(account, "https://www.funzpoints.com/claim-coins", 
                                    login_selector="#login-form", 
                                    claim_selector="#claim-coins-button")
 
     def claim_pulsz_casino(self, account):
+        logging.info(f"Claiming coins for Pulsz Casino account: {account['id']}")
         return self._generic_claim(account, "https://www.pulsz.com/claim-coins", 
                                    login_selector="#login-form", 
                                    claim_selector="#claim-coins-button")

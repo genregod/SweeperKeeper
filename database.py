@@ -85,3 +85,40 @@ def get_coin_claim_history(conn, account_id):
         ORDER BY claim_time DESC
     ''', (account_id,))
     return cursor.fetchall()
+
+def add_test_accounts(conn):
+    cursor = conn.cursor()
+    
+    # First, check if there are any accounts
+    cursor.execute('SELECT COUNT(*) FROM accounts')
+    account_count = cursor.fetchone()[0]
+    
+    if account_count == 0:
+        # Add test casinos if they don't exist
+        casinos = [
+            ("Chumba Casino", "https://www.chumbacasino.com"),
+            ("LuckyLand Slots", "https://www.luckylandslots.com"),
+            ("Global Poker", "https://www.globalpoker.com"),
+            ("Funzpoints", "https://www.funzpoints.com"),
+            ("Pulsz Casino", "https://www.pulsz.com")
+        ]
+        
+        for casino in casinos:
+            cursor.execute('INSERT OR IGNORE INTO casinos (name, website) VALUES (?, ?)', casino)
+        
+        # Add test accounts
+        test_accounts = [
+            (1, "testuser1"),
+            (2, "testuser2"),
+            (3, "testuser3"),
+            (4, "testuser4"),
+            (5, "testuser5")
+        ]
+        
+        for account in test_accounts:
+            cursor.execute('INSERT INTO accounts (casino_id, username) VALUES (?, ?)', account)
+        
+        conn.commit()
+        logging.info("Added test accounts to the database")
+    else:
+        logging.info(f"Database already contains {account_count} accounts. Skipping test account creation.")
