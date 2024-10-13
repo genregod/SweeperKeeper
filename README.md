@@ -1,6 +1,6 @@
 # SweeperKeeper
 
-SweeperKeeper is a manual social casino tracker with notification features to help users efficiently manage their free coin collection without automation.
+SweeperKeeper is a manual social casino tracker that helps users efficiently manage their free coin collection without any automation.
 
 ## Features
 
@@ -8,6 +8,7 @@ SweeperKeeper is a manual social casino tracker with notification features to he
 - Receive timely notifications for free coin collection
 - Manage and maximize your free coin earnings
 - Responsible gaming guidelines and resources
+- Completely manual tracking - no automation involved
 
 ## Getting Started
 
