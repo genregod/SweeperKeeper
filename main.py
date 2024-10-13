@@ -1,5 +1,5 @@
 import logging
-from database import initialize_database
+from database import initialize_database, store_casino_info
 from user_interface import start_cli
 from casino_locator import locate_casinos
 from coin_claimer import setup_coin_claimer
@@ -29,16 +29,6 @@ def main():
     
     # Start command-line interface
     start_cli(db, casinos, coin_claimer, scheduler)
-
-def store_casino_info(db, casinos):
-    cursor = db.cursor()
-    for casino in casinos:
-        cursor.execute("""
-            INSERT OR REPLACE INTO casinos (name, website)
-            VALUES (?, ?)
-        """, (casino['name'], casino['website']))
-    db.commit()
-    logging.info(f"Stored information for {len(casinos)} casinos")
 
 if __name__ == "__main__":
     try:

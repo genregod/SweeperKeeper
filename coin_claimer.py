@@ -30,40 +30,65 @@ class CoinClaimer:
             return False
 
     def claim_chumba_casino(self, account):
-        return self._generic_claim(account, "https://www.chumbacasino.com/claim-coins")
+        return self._generic_claim(account, "https://www.chumbacasino.com/claim-coins", 
+                                   login_selector="#login-form", 
+                                   claim_selector="#claim-coins-button")
 
     def claim_luckyland_slots(self, account):
-        return self._generic_claim(account, "https://www.luckylandslots.com/claim-coins")
+        return self._generic_claim(account, "https://www.luckylandslots.com/claim-coins", 
+                                   login_selector="#login-form", 
+                                   claim_selector="#claim-coins-button")
 
     def claim_global_poker(self, account):
-        return self._generic_claim(account, "https://www.globalpoker.com/claim-coins")
+        return self._generic_claim(account, "https://www.globalpoker.com/claim-coins", 
+                                   login_selector="#login-form", 
+                                   claim_selector="#claim-coins-button")
 
     def claim_funzpoints(self, account):
-        return self._generic_claim(account, "https://www.funzpoints.com/claim-coins")
+        return self._generic_claim(account, "https://www.funzpoints.com/claim-coins", 
+                                   login_selector="#login-form", 
+                                   claim_selector="#claim-coins-button")
 
     def claim_pulsz_casino(self, account):
-        return self._generic_claim(account, "https://www.pulsz.com/claim-coins")
+        return self._generic_claim(account, "https://www.pulsz.com/claim-coins", 
+                                   login_selector="#login-form", 
+                                   claim_selector="#claim-coins-button")
 
-    def _generic_claim(self, account, claim_url):
+    def _generic_claim(self, account, claim_url, login_selector, claim_selector):
         try:
             session = requests.Session()
             login_url = f"{account['website']}/login"
 
-            # Simulate login (this is a placeholder and should be implemented properly)
+            # Simulate login
             login_data = {"username": account['username'], "password": "placeholder_password"}
-            session.post(login_url, data=login_data)
-
-            # Simulate claiming coins
-            response = session.get(claim_url)
-            if "Coins claimed successfully" in response.text:
-                logging.info(f"Successfully claimed coins for account {account['id']} on {account['casino_name']}")
-                return True
-            else:
-                logging.warning(f"Failed to claim coins for account {account['id']} on {account['casino_name']}")
+            login_response = session.post(login_url, data=login_data)
+            
+            if login_response.status_code != 200:
+                logging.error(f"Failed to login for account {account['id']} on {account['casino_name']}")
                 return False
 
+            # Simulate claiming coins
+            claim_response = session.get(claim_url)
+            soup = BeautifulSoup(claim_response.text, 'html.parser')
+            
+            claim_button = soup.select_one(claim_selector)
+            if claim_button:
+                claim_result = session.post(claim_url, data={"claim": "true"})
+                if "Coins claimed successfully" in claim_result.text:
+                    logging.info(f"Successfully claimed coins for account {account['id']} on {account['casino_name']}")
+                    return True
+                else:
+                    logging.warning(f"Failed to claim coins for account {account['id']} on {account['casino_name']}")
+                    return False
+            else:
+                logging.warning(f"Claim button not found for account {account['id']} on {account['casino_name']}")
+                return False
+
+        except requests.RequestException as e:
+            logging.error(f"Network error while claiming coins for account {account['id']} on {account['casino_name']}: {str(e)}")
+            return False
         except Exception as e:
-            logging.error(f"Error claiming coins for account {account['id']} on {account['casino_name']}: {str(e)}")
+            logging.error(f"Unexpected error claiming coins for account {account['id']} on {account['casino_name']}: {str(e)}")
             return False
 
     def get_account(self, account_id):
