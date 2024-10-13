@@ -8,7 +8,7 @@ def locate_casinos():
     casinos = []
     
     # Use a search engine API to find social casino websites
-    search_query = "social casino free coins"
+    search_query = "social casino free sweeps coins"
     search_url = f"https://www.googleapis.com/customsearch/v1?key={SEARCH_API_KEY}&cx={SEARCH_ENGINE_ID}&q={search_query}"
     
     try:
@@ -36,7 +36,7 @@ def verify_casino(website):
         soup = BeautifulSoup(response.text, 'html.parser')
         
         # Look for keywords that suggest it's a social casino
-        keywords = ['free coins', 'slots', 'casino games', 'play now']
+        keywords = ['free coins', 'sweeps coins', 'slots', 'casino games', 'play now']
         text_content = soup.get_text().lower()
         
         if any(keyword in text_content for keyword in keywords):

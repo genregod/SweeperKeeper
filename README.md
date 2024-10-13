@@ -6,7 +6,7 @@ SweeperKeeper is a manual social casino tracker that helps users efficiently man
 
 - Track multiple social casino accounts
 - Receive timely notifications for free coin collection
-- Manage and maximize your free coin earnings
+- License and maximize your free coin earnings
 - Responsible gaming guidelines and resources
 - Completely manual tracking - no automation involved
 
@@ -23,4 +23,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MITLicensee.

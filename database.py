@@ -1,10 +1,9 @@
 import sqlite3
 import logging
-from utils import hash_password
 
 def initialize_database():
     logging.info("Initializing database")
-    conn = sqlite3.connect('casino_bot.db')
+    conn = sqlite3.connect('sweeper_keeper.db')
     cursor = conn.cursor()
     
     # Create tables
@@ -17,12 +16,23 @@ def initialize_database():
     ''')
     
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE IF NOT EXISTS accounts (
             id INTEGER PRIMARY KEY,
             casino_id INTEGER,
             username TEXT NOT NULL,
-            password_hash TEXT NOT NULL,
+            next_reminder DATETIME,
+            auto_claim BOOLEAN DEFAULT 0,
             FOREIGN KEY (casino_id) REFERENCES casinos (id)
+        )
+    ''')
+    
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS coin_claims (
+            id INTEGER PRIMARY KEY,
+            account_id INTEGER,
+            claim_time DATETIME,
+            amount REAL,
+            FOREIGN KEY (account_id) REFERENCES accounts (id)
         )
     ''')
     
@@ -39,21 +49,39 @@ def store_casino_info(conn, casinos):
     conn.commit()
     logging.info(f"Stored information for {len(casinos)} casinos")
 
-def store_user_credentials(conn, casino_id, username, password):
+def store_account_info(conn, casino_id, username, auto_claim=False):
     cursor = conn.cursor()
-    password_hash = hash_password(password)
     cursor.execute('''
-        INSERT INTO users (casino_id, username, password_hash)
+        INSERT INTO accounts (casino_id, username, auto_claim)
         VALUES (?, ?, ?)
-    ''', (casino_id, username, password_hash))
+    ''', (casino_id, username, auto_claim))
     conn.commit()
-    logging.info(f"Stored credentials for user {username}")
+    logging.info(f"Stored account information for user {username}")
 
-def get_user_credentials(conn, casino_id):
+def get_accounts(conn):
     cursor = conn.cursor()
     cursor.execute('''
-        SELECT username, password_hash FROM users
-        WHERE casino_id = ?
-    ''', (casino_id,))
-    return cursor.fetchone()
+        SELECT accounts.id, casinos.name, accounts.username, accounts.next_reminder, accounts.auto_claim
+        FROM accounts
+        JOIN casinos ON accounts.casino_id = casinos.id
+    ''')
+    return cursor.fetchall()
 
+def log_coin_claim(conn, account_id, amount):
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO coin_claims (account_id, claim_time, amount)
+        VALUES (?, CURRENT_TIMESTAMP, ?)
+    ''', (account_id, amount))
+    conn.commit()
+    logging.info(f"Logged coin claim for account {account_id}: {amount} coins")
+
+def get_coin_claim_history(conn, account_id):
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT claim_time, amount
+        FROM coin_claims
+        WHERE account_id = ?
+        ORDER BY claim_time DESC
+    ''', (account_id,))
+    return cursor.fetchall()

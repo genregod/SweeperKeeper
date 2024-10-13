@@ -1,37 +1,31 @@
 import logging
-from casino_locator import locate_casinos, verify_casino
-from database import initialize_database, store_casino_info
+from database import initialize_database
+from user_interface import start_cli
+from casino_locator import locate_casinos
 from coin_claimer import setup_coin_claimer
 from scheduler import setup_scheduler
-from user_interface import start_cli
 
 # Configure logging
-logging.basicConfig(filename='casino_bot.log', level=logging.INFO,
+logging.basicConfig(filename='sweeper_keeper.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 def main():
-    logging.info("Starting Social Casino Bot")
+    logging.info("Starting SweeperKeeper")
     
     # Initialize database
     db = initialize_database()
     
-    # Locate and store casino information
-    potential_casinos = locate_casinos()
-    verified_casinos = []
-    for casino in potential_casinos:
-        if verify_casino(casino['website']):
-            verified_casinos.append(casino)
-    
-    store_casino_info(db, verified_casinos)
+    # Locate social casinos
+    casinos = locate_casinos()
     
     # Setup coin claimer
-    claimer = setup_coin_claimer(db)
+    coin_claimer = setup_coin_claimer(db)
     
-    # Setup scheduler
-    scheduler = setup_scheduler(claimer)
+    # Setup scheduler for automated tasks
+    scheduler = setup_scheduler(coin_claimer)
     
     # Start command-line interface
-    start_cli(db, claimer, scheduler)
+    start_cli(db, casinos, coin_claimer, scheduler)
 
 if __name__ == "__main__":
     try:
