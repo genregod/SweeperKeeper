@@ -332,3 +332,44 @@
 2024-10-13 17:44:11,144 - WARNING - Failed to claim coins for account 4
 2024-10-13 17:44:11,144 - WARNING - Failed to claim coins for account 5
 2024-10-13 17:44:11,144 - INFO - Scheduled daily coin claiming for all accounts
+2024-10-13 19:46:04,120 - INFO - Starting SweeperKeeper
+2024-10-13 19:46:04,124 - INFO - Initializing database
+2024-10-13 19:46:04,129 - INFO - Database already contains 5 accounts. Skipping test account creation.
+2024-10-13 19:46:04,129 - INFO - Locating social casinos
+2024-10-13 19:46:05,526 - INFO - Found 2 verified social casinos
+2024-10-13 19:46:05,568 - INFO - Stored information for 2 casinos
+2024-10-13 19:46:05,569 - INFO - Starting multi-threaded coin claiming test
+2024-10-13 19:46:05,569 - INFO - Starting claim_coins_for_all_accounts method
+2024-10-13 19:46:05,569 - INFO - Found 5 accounts to process
+2024-10-13 19:46:05,575 - INFO - Attempting to claim coins for account 1
+2024-10-13 19:46:05,576 - INFO - Attempting to claim coins for account 2
+2024-10-13 19:46:05,577 - INFO - Attempting to claim coins for account 3
+2024-10-13 19:46:05,577 - INFO - Claiming coins for Chumba Casino account: 1
+2024-10-13 19:46:05,578 - INFO - Attempting to claim coins for account 4
+2024-10-13 19:46:05,578 - INFO - Attempting to claim coins for account 5
+2024-10-13 19:46:05,580 - INFO - Claiming coins for Chumba Casino account: 3
+2024-10-13 19:46:05,581 - INFO - Claiming coins for Global Poker account: 2
+2024-10-13 19:46:05,587 - INFO - Claiming coins for Global Poker account: 4
+2024-10-13 19:46:05,591 - INFO - Claiming coins for Chumba Casino account: 5
+2024-10-13 19:46:06,002 - ERROR - Failed to login for account 3 on Chumba Casino
+2024-10-13 19:46:06,013 - INFO - Coin claiming for account 3 completed with result: False
+2024-10-13 19:46:06,098 - ERROR - Failed to login for account 2 on Global Poker
+2024-10-13 19:46:06,098 - INFO - Coin claiming for account 2 completed with result: False
+2024-10-13 19:46:06,109 - ERROR - Failed to login for account 4 on Global Poker
+2024-10-13 19:46:06,109 - INFO - Coin claiming for account 4 completed with result: False
+2024-10-13 19:46:06,306 - ERROR - Failed to login for account 1 on Chumba Casino
+2024-10-13 19:46:06,310 - INFO - Coin claiming for account 1 completed with result: False
+2024-10-13 19:46:06,330 - ERROR - Failed to login for account 5 on Chumba Casino
+2024-10-13 19:46:06,331 - INFO - Coin claiming for account 5 completed with result: False
+2024-10-13 19:46:06,333 - INFO - claim_coins_for_all_accounts completed. Results: [(3, False), (2, False), (4, False), (1, False), (5, False)]
+2024-10-13 19:46:06,333 - INFO - Multi-threaded coin claiming test results: [(3, False), (2, False), (4, False), (1, False), (5, False)]
+2024-10-13 19:46:06,334 - INFO - Multi-threaded coin claiming summary:
+2024-10-13 19:46:06,334 - INFO - Total accounts processed: 5
+2024-10-13 19:46:06,334 - INFO - Successful claims: 0
+2024-10-13 19:46:06,334 - INFO - Failed claims: 5
+2024-10-13 19:46:06,334 - WARNING - Failed to claim coins for account 3
+2024-10-13 19:46:06,334 - WARNING - Failed to claim coins for account 2
+2024-10-13 19:46:06,335 - WARNING - Failed to claim coins for account 4
+2024-10-13 19:46:06,335 - WARNING - Failed to claim coins for account 1
+2024-10-13 19:46:06,335 - WARNING - Failed to claim coins for account 5
+2024-10-13 19:46:06,335 - INFO - Scheduled daily coin claiming for all accounts

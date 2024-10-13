@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -41,6 +41,7 @@ class Account(db.Model):
     casino_id = db.Column(db.Integer, db.ForeignKey('casino.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     casino = db.relationship('Casino', backref='accounts')
+    coins = db.Column(db.Integer, default=0)
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -73,22 +74,21 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and check_password_hash(user.password, form.password.data):
+    if request.method == 'POST':
+        username = request.json.get('username')
+        password = request.json.get('password')
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
             login_user(user)
-            flash('Logged in successfully.', 'success')
-            return redirect(url_for('dashboard'))
-        flash('Invalid username or password', 'danger')
-    return render_template('login.html', form=form)
+            return jsonify({"success": True, "message": "Logged in successfully"})
+        return jsonify({"success": False, "message": "Invalid username or password"}), 401
+    return render_template('login.html')
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out.', 'info')
-    return redirect(url_for('index'))
+    return jsonify({"success": True, "message": "Logged out successfully"})
 
 @app.route('/dashboard')
 @login_required
@@ -129,15 +129,14 @@ def add_account():
 def claim_coins(account_id):
     account = Account.query.get_or_404(account_id)
     if account.user_id != current_user.id:
-        flash('You are not authorized to claim coins for this account.', 'danger')
-        return redirect(url_for('dashboard'))
+        return jsonify({"success": False, "message": "You are not authorized to claim coins for this account"}), 403
     
     success = coin_claimer.claim_coins(account_id)
     if success:
-        flash('Coins claimed successfully!', 'success')
-    else:
-        flash('Failed to claim coins. Please try again later.', 'danger')
-    return redirect(url_for('dashboard'))
+        account.coins += 100  # Assume 100 coins are claimed each time
+        db.session.commit()
+        return jsonify({"success": True, "message": "Coins claimed successfully"})
+    return jsonify({"success": False, "message": "Failed to claim coins"}), 500
 
 @app.route('/analytics')
 @login_required
@@ -147,7 +146,6 @@ def analytics_dashboard():
     coins_by_casino = analytics.get_coins_claimed_by_casino(current_user.id)
     claim_history = analytics.get_claim_history(current_user.id)
 
-    # Get time-based analytics
     last_24h_coins = analytics.get_total_coins_claimed(current_user.id, timedelta(hours=24))
     last_7d_coins = analytics.get_total_coins_claimed(current_user.id, timedelta(days=7))
     last_30d_coins = analytics.get_total_coins_claimed(current_user.id, timedelta(days=30))
@@ -160,6 +158,18 @@ def analytics_dashboard():
                            last_24h_coins=last_24h_coins,
                            last_7d_coins=last_7d_coins,
                            last_30d_coins=last_30d_coins)
+
+@app.route('/api/casinos')
+@login_required
+def api_casinos():
+    casinos = Casino.query.filter_by(user_id=current_user.id).all()
+    return jsonify([{"id": casino.id, "name": casino.name, "website": casino.website} for casino in casinos])
+
+@app.route('/api/accounts')
+@login_required
+def api_accounts():
+    accounts = Account.query.filter_by(user_id=current_user.id).all()
+    return jsonify([{"id": account.id, "username": account.username, "casino": account.casino.name, "coins": account.coins} for account in accounts])
 
 if __name__ == '__main__':
     with app.app_context():
