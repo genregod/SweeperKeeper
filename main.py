@@ -18,6 +18,9 @@ def main():
     # Locate social casinos
     casinos = locate_casinos()
     
+    # Store casino information in the database
+    store_casino_info(db, casinos)
+    
     # Setup coin claimer
     coin_claimer = setup_coin_claimer(db)
     
@@ -26,6 +29,16 @@ def main():
     
     # Start command-line interface
     start_cli(db, casinos, coin_claimer, scheduler)
+
+def store_casino_info(db, casinos):
+    cursor = db.cursor()
+    for casino in casinos:
+        cursor.execute("""
+            INSERT OR REPLACE INTO casinos (name, website)
+            VALUES (?, ?)
+        """, (casino['name'], casino['website']))
+    db.commit()
+    logging.info(f"Stored information for {len(casinos)} casinos")
 
 if __name__ == "__main__":
     try:
