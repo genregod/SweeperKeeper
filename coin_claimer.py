@@ -3,6 +3,8 @@ import requests
 from bs4 import BeautifulSoup
 from database import get_accounts
 from casino_locator import KNOWN_CASINOS
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
 
 class CoinClaimer:
     def __init__(self, db):
@@ -14,6 +16,7 @@ class CoinClaimer:
             "Funzpoints": self.claim_funzpoints,
             "Pulsz Casino": self.claim_pulsz_casino,
         }
+        self.thread_local = threading.local()
 
     def claim_coins(self, account_id):
         logging.info(f"Attempting to claim coins for account {account_id}")
@@ -28,6 +31,28 @@ class CoinClaimer:
         else:
             logging.error(f"No handler found for casino: {casino_name}")
             return False
+
+    def claim_coins_for_all_accounts(self, max_workers=5):
+        accounts = get_accounts(self.db)
+        results = []
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_account = {executor.submit(self.claim_coins, account[0]): account for account in accounts}
+            for future in as_completed(future_to_account):
+                account = future_to_account[future]
+                try:
+                    result = future.result()
+                    results.append((account[0], result))
+                except Exception as exc:
+                    logging.error(f"Account {account[0]} generated an exception: {exc}")
+                    results.append((account[0], False))
+
+        return results
+
+    def get_session(self):
+        if not hasattr(self.thread_local, "session"):
+            self.thread_local.session = requests.Session()
+        return self.thread_local.session
 
     def claim_chumba_casino(self, account):
         return self._generic_claim(account, "https://www.chumbacasino.com/claim-coins", 
@@ -56,7 +81,7 @@ class CoinClaimer:
 
     def _generic_claim(self, account, claim_url, login_selector, claim_selector):
         try:
-            session = requests.Session()
+            session = self.get_session()
             login_url = f"{account['website']}/login"
 
             # Simulate login

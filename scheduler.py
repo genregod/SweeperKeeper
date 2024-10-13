@@ -23,11 +23,16 @@ class Scheduler:
             time.sleep(1)
 
     def schedule_coin_claiming(self):
-        accounts = get_accounts(self.coin_claimer.db)
-        for account in accounts:
-            account_id = account[0]
-            schedule.every().day.at("00:00").do(self.coin_claimer.claim_coins, account_id)
+        schedule.every().day.at("00:00").do(self.claim_coins_for_all_accounts)
         logging.info("Scheduled daily coin claiming for all accounts")
+
+    def claim_coins_for_all_accounts(self):
+        results = self.coin_claimer.claim_coins_for_all_accounts()
+        for account_id, success in results:
+            if success:
+                logging.info(f"Successfully claimed coins for account {account_id}")
+            else:
+                logging.warning(f"Failed to claim coins for account {account_id}")
 
 def setup_scheduler(coin_claimer):
     scheduler = Scheduler(coin_claimer)

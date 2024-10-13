@@ -9,6 +9,11 @@ from scheduler import setup_scheduler
 logging.basicConfig(filename='sweeper_keeper.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Add a console handler to see logs in the terminal
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+logging.getLogger().addHandler(console_handler)
+
 def main():
     logging.info("Starting SweeperKeeper")
     
@@ -23,6 +28,16 @@ def main():
     
     # Setup coin claimer
     coin_claimer = setup_coin_claimer(db)
+    
+    # Test multi-threaded coin claiming
+    logging.info("Starting multi-threaded coin claiming test")
+    results = coin_claimer.claim_coins_for_all_accounts()
+    logging.info(f"Multi-threaded coin claiming test results: {results}")
+    for account_id, success in results:
+        if success:
+            logging.info(f"Successfully claimed coins for account {account_id}")
+        else:
+            logging.warning(f"Failed to claim coins for account {account_id}")
     
     # Setup scheduler for automated tasks
     scheduler = setup_scheduler(coin_claimer)
