@@ -31,3 +31,45 @@ h1, h2, h3 {
 .form-group {
     margin-bottom: 20px;
 }
+
+/* Mobile-friendly styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .table {
+        font-size: 14px;
+    }
+}
+
+/* Custom styles for better mobile experience */
+.card {
+    margin-bottom: 20px;
+}
+
+.navbar-brand {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.alert {
+    margin-bottom: 20px;
+}
+
+.footer {
+    margin-top: 40px;
+}
