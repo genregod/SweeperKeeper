@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Your Casino Dashboard</h2>
+<div class="row">
+    <div class="col-md-8">
+        <h3>Your Tracked Casinos</h3>
+        {% if casinos %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Casino Name</th>
+                        <th>Last Collection</th>
+                        <th>Next Collection</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for casino in casinos %}
+                    <tr>
+                        <td>{{ casino.name }}</td>
+                        <td>{{ casino.last_collection.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ casino.next_collection.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% if casino.next_collection <= now() %}
+                            <a href="{{ url_for('main.collect', casino_id=casino.id) }}" class="btn btn-success btn-sm">Collect</a>
+                            {% else %}
+                            <button class="btn btn-secondary btn-sm" disabled>Wait</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>You haven't added any casinos yet. Add one to start tracking!</p>
+        {% endif %}
+        <a href="{{ url_for('main.add_casino') }}" class="btn btn-primary">Add New Casino</a>
+    </div>
+    <div class="col-md-4">
+        <h3>Tips for Efficient Coin Collection</h3>
+        <ul class="list-group">
+            <li class="list-group-item">Set reminders for collection times</li>
+            <li class="list-group-item">Prioritize casinos with shorter collection intervals</li>
+            <li class="list-group-item">Take advantage of special events and promotions</li>
+            <li class="list-group-item">Invite friends for bonus coins</li>
+            <li class="list-group-item">Complete daily challenges for extra rewards</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

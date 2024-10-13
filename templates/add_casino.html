@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Add New Casino</h2>
+<form method="POST" action="{{ url_for('main.add_casino') }}">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.name.label(class="form-label") }}
+        {{ form.name(class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ form.collection_interval.label(class="form-label") }}
+        {{ form.collection_interval(class="form-control") }}
+        <small class="form-text text-muted">Enter the number of hours between free coin collections.</small>
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}
