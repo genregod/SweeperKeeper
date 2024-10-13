@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
+    pkgs.python-launcher
     pkgs.geckodriver
     pkgs.rustc
     pkgs.pkg-config

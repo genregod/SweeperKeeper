@@ -5,10 +5,11 @@ from database import get_accounts
 from casino_locator import KNOWN_CASINOS
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
+import sqlite3
 
 class CoinClaimer:
-    def __init__(self, db):
-        self.db = db
+    def __init__(self):
+        self.thread_local = threading.local()
         self.casino_handlers = {
             "Chumba Casino": self.claim_chumba_casino,
             "LuckyLand Slots": self.claim_luckyland_slots,
@@ -16,7 +17,11 @@ class CoinClaimer:
             "Funzpoints": self.claim_funzpoints,
             "Pulsz Casino": self.claim_pulsz_casino,
         }
-        self.thread_local = threading.local()
+
+    def get_db(self):
+        if not hasattr(self.thread_local, 'db'):
+            self.thread_local.db = sqlite3.connect('sweeper_keeper.db')
+        return self.thread_local.db
 
     def claim_coins(self, account_id):
         logging.info(f"Attempting to claim coins for account {account_id}")
@@ -34,7 +39,7 @@ class CoinClaimer:
 
     def claim_coins_for_all_accounts(self, max_workers=5):
         logging.info("Starting claim_coins_for_all_accounts method")
-        accounts = get_accounts(self.db)
+        accounts = self.get_accounts()
         logging.info(f"Found {len(accounts)} accounts to process")
         results = []
 
@@ -126,7 +131,8 @@ class CoinClaimer:
             return False
 
     def get_account(self, account_id):
-        cursor = self.db.cursor()
+        db = self.get_db()
+        cursor = db.cursor()
         cursor.execute("""
             SELECT accounts.id, casinos.name, casinos.website, accounts.username
             FROM accounts
@@ -143,5 +149,15 @@ class CoinClaimer:
             }
         return None
 
-def setup_coin_claimer(db):
-    return CoinClaimer(db)
+    def get_accounts(self):
+        db = self.get_db()
+        cursor = db.cursor()
+        cursor.execute("""
+            SELECT accounts.id, casinos.name, accounts.username, accounts.next_reminder, accounts.auto_claim
+            FROM accounts
+            JOIN casinos ON accounts.casino_id = casinos.id
+        """)
+        return cursor.fetchall()
+
+def setup_coin_claimer():
+    return CoinClaimer()

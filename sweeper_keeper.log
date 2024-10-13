@@ -14,3 +14,34 @@
 2024-10-13 17:03:42,338 - INFO - Starting multi-threaded coin claiming test
 2024-10-13 17:03:42,338 - INFO - Multi-threaded coin claiming test results: []
 2024-10-13 17:03:42,338 - INFO - Scheduled daily coin claiming for all accounts
+2024-10-13 17:14:57,824 - INFO - Starting SweeperKeeper
+2024-10-13 17:14:57,833 - INFO - Initializing database
+2024-10-13 17:14:57,859 - INFO - Added test accounts to the database
+2024-10-13 17:14:57,860 - INFO - Locating social casinos
+2024-10-13 17:14:59,246 - INFO - Found 2 verified social casinos
+2024-10-13 17:14:59,347 - INFO - Stored information for 2 casinos
+2024-10-13 17:14:59,348 - INFO - Starting multi-threaded coin claiming test
+2024-10-13 17:14:59,348 - INFO - Starting claim_coins_for_all_accounts method
+2024-10-13 17:14:59,348 - INFO - Found 5 accounts to process
+2024-10-13 17:14:59,349 - INFO - Attempting to claim coins for account 1
+2024-10-13 17:14:59,349 - INFO - Attempting to claim coins for account 2
+2024-10-13 17:14:59,350 - INFO - Attempting to claim coins for account 3
+2024-10-13 17:14:59,350 - ERROR - Account 2 generated an exception: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140202657097664 and this is thread id 140202613909184.
+2024-10-13 17:14:59,350 - ERROR - Account 3 generated an exception: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140202657097664 and this is thread id 140202613909184.
+2024-10-13 17:14:59,350 - ERROR - Account 1 generated an exception: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140202657097664 and this is thread id 140202613909184.
+2024-10-13 17:14:59,350 - INFO - Attempting to claim coins for account 4
+2024-10-13 17:14:59,350 - INFO - Attempting to claim coins for account 5
+2024-10-13 17:14:59,351 - ERROR - Account 4 generated an exception: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140202657097664 and this is thread id 140202613909184.
+2024-10-13 17:14:59,351 - ERROR - Account 5 generated an exception: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140202657097664 and this is thread id 140202613909184.
+2024-10-13 17:14:59,351 - INFO - claim_coins_for_all_accounts completed. Results: [(2, False), (3, False), (1, False), (4, False), (5, False)]
+2024-10-13 17:14:59,351 - INFO - Multi-threaded coin claiming test results: [(2, False), (3, False), (1, False), (4, False), (5, False)]
+2024-10-13 17:14:59,351 - INFO - Multi-threaded coin claiming summary:
+2024-10-13 17:14:59,352 - INFO - Total accounts processed: 5
+2024-10-13 17:14:59,352 - INFO - Successful claims: 0
+2024-10-13 17:14:59,352 - INFO - Failed claims: 5
+2024-10-13 17:14:59,352 - WARNING - Failed to claim coins for account 2
+2024-10-13 17:14:59,352 - WARNING - Failed to claim coins for account 3
+2024-10-13 17:14:59,352 - WARNING - Failed to claim coins for account 1
+2024-10-13 17:14:59,352 - WARNING - Failed to claim coins for account 4
+2024-10-13 17:14:59,352 - WARNING - Failed to claim coins for account 5
+2024-10-13 17:14:59,353 - INFO - Scheduled daily coin claiming for all accounts

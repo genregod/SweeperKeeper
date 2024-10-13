@@ -32,7 +32,7 @@ def main():
     store_casino_info(db, casinos)
     
     # Setup coin claimer
-    coin_claimer = setup_coin_claimer(db)
+    coin_claimer = setup_coin_claimer()
     
     # Test multi-threaded coin claiming
     logging.info("Starting multi-threaded coin claiming test")
