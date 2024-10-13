@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Add Account{% endblock %}
 
 {% block content %}
-<h2>Login</h2>
+<h2>Add Account</h2>
 <form method="POST">
     {{ form.hidden_tag() }}
     <div class="form-group">
@@ -11,8 +11,8 @@
         {{ form.username(class="form-control") }}
     </div>
     <div class="form-group">
-        {{ form.password.label }}
-        {{ form.password(class="form-control") }}
+        {{ form.casino.label }}
+        {{ form.casino(class="form-control") }}
     </div>
     {{ form.submit(class="btn btn-primary") }}
 </form>

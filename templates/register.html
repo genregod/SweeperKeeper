@@ -1,36 +1,26 @@
 {% extends "base.html" %}
 
+{% block title %}Register{% endblock %}
+
 {% block content %}
 <h2>Register</h2>
-<form method="POST" action="{{ url_for('main.register') }}">
+<form method="POST">
     {{ form.hidden_tag() }}
-    <div class="mb-3">
-        {{ form.username.label(class="form-label") }}
+    <div class="form-group">
+        {{ form.username.label }}
         {{ form.username(class="form-control") }}
-        {% for error in form.username.errors %}
-        <span class="text-danger">{{ error }}</span>
-        {% endfor %}
     </div>
-    <div class="mb-3">
-        {{ form.email.label(class="form-label") }}
+    <div class="form-group">
+        {{ form.email.label }}
         {{ form.email(class="form-control") }}
-        {% for error in form.email.errors %}
-        <span class="text-danger">{{ error }}</span>
-        {% endfor %}
     </div>
-    <div class="mb-3">
-        {{ form.password.label(class="form-label") }}
+    <div class="form-group">
+        {{ form.password.label }}
         {{ form.password(class="form-control") }}
-        {% for error in form.password.errors %}
-        <span class="text-danger">{{ error }}</span>
-        {% endfor %}
     </div>
-    <div class="mb-3">
-        {{ form.password2.label(class="form-label") }}
-        {{ form.password2(class="form-control") }}
-        {% for error in form.password2.errors %}
-        <span class="text-danger">{{ error }}</span>
-        {% endfor %}
+    <div class="form-group">
+        {{ form.confirm_password.label }}
+        {{ form.confirm_password(class="form-control") }}
     </div>
     {{ form.submit(class="btn btn-primary") }}
 </form>
