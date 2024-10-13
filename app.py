@@ -2,8 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired
 import os
 from coin_claimer import CoinClaimer
+from analytics import Analytics
+from datetime import timedelta
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', 'default_secret_key')
@@ -15,6 +20,7 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
 coin_claimer = CoinClaimer()
+analytics = Analytics()
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,6 +41,11 @@ class Account(db.Model):
     casino_id = db.Column(db.Integer, db.ForeignKey('casino.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     casino = db.relationship('Casino', backref='accounts')
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -62,16 +73,15 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and check_password_hash(user.password, form.password.data):
             login_user(user)
             flash('Logged in successfully.', 'success')
             return redirect(url_for('dashboard'))
         flash('Invalid username or password', 'danger')
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 @app.route('/logout')
 @login_required
@@ -128,6 +138,28 @@ def claim_coins(account_id):
     else:
         flash('Failed to claim coins. Please try again later.', 'danger')
     return redirect(url_for('dashboard'))
+
+@app.route('/analytics')
+@login_required
+def analytics_dashboard():
+    total_coins = analytics.get_total_coins_claimed(current_user.id)
+    success_rate = analytics.get_claim_success_rate(current_user.id)
+    coins_by_casino = analytics.get_coins_claimed_by_casino(current_user.id)
+    claim_history = analytics.get_claim_history(current_user.id)
+
+    # Get time-based analytics
+    last_24h_coins = analytics.get_total_coins_claimed(current_user.id, timedelta(hours=24))
+    last_7d_coins = analytics.get_total_coins_claimed(current_user.id, timedelta(days=7))
+    last_30d_coins = analytics.get_total_coins_claimed(current_user.id, timedelta(days=30))
+
+    return render_template('analytics.html', 
+                           total_coins=total_coins,
+                           success_rate=success_rate,
+                           coins_by_casino=coins_by_casino,
+                           claim_history=claim_history,
+                           last_24h_coins=last_24h_coins,
+                           last_7d_coins=last_7d_coins,
+                           last_30d_coins=last_30d_coins)
 
 if __name__ == '__main__':
     with app.app_context():

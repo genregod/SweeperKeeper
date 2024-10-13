@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block content %}
+<h2>Analytics Dashboard</h2>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">Total Coins Claimed</div>
+            <div class="card-body">
+                <h3>{{ total_coins }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">Claim Success Rate</div>
+            <div class="card-body">
+                <h3>{{ "%.2f"|format(success_rate) }}%</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">Last 24 Hours</div>
+            <div class="card-body">
+                <h4>{{ last_24h_coins }} coins</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">Last 7 Days</div>
+            <div class="card-body">
+                <h4>{{ last_7d_coins }} coins</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">Last 30 Days</div>
+            <div class="card-body">
+                <h4>{{ last_30d_coins }} coins</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <h3>Coins Claimed by Casino</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Casino</th>
+                    <th>Total Coins</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for casino, coins in coins_by_casino %}
+                <tr>
+                    <td>{{ casino }}</td>
+                    <td>{{ coins }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h3>Recent Claim History</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Casino</th>
+                    <th>Account</th>
+                    <th>Time</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for casino, account, time, amount in claim_history %}
+                <tr>
+                    <td>{{ casino }}</td>
+                    <td>{{ account }}</td>
+                    <td>{{ time }}</td>
+                    <td>{{ amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
