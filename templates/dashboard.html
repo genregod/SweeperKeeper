@@ -3,46 +3,53 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h2>Dashboard</h2>
-<h3>Your Casinos</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Website</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for casino in casinos %}
-        <tr>
-            <td>{{ casino.name }}</td>
-            <td>{{ casino.website }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<a href="{{ url_for('add_casino') }}" class="btn btn-primary">Add Casino</a>
+<h2>Welcome, {{ current_user.username }}!</h2>
 
-<h3>Your Accounts</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Casino</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for account in accounts %}
-        <tr>
-            <td>{{ account.username }}</td>
-            <td>{{ account.casino.name }}</td>
-            <td>
-                <a href="{{ url_for('claim_coins', account_id=account.id) }}" class="btn btn-sm btn-success btn-claim-coins">Claim Coins</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<a href="{{ url_for('add_account') }}" class="btn btn-primary">Add Account</a>
+<div class="row mt-4">
+    <div class="col-md-6">
+        <h3>Your Casinos</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Website</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for casino in casinos %}
+                <tr>
+                    <td>{{ casino.name }}</td>
+                    <td><a href="{{ casino.website }}" target="_blank">{{ casino.website }}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('add_casino') }}" class="btn btn-primary">Add Casino</a>
+    </div>
+
+    <div class="col-md-6">
+        <h3>Your Accounts</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Casino</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                <tr>
+                    <td>{{ account.username }}</td>
+                    <td>{{ account.casino.name }}</td>
+                    <td>
+                        <a href="{{ url_for('claim_coins', account_id=account.id) }}" class="btn btn-sm btn-success">Claim Coins</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('add_account') }}" class="btn btn-primary">Add Account</a>
+    </div>
+</div>
 {% endblock %}

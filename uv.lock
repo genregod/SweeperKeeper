@@ -705,6 +705,7 @@ dependencies = [
     { name = "schedule" },
     { name = "selenium" },
     { name = "trafilatura" },
+    { name = "werkzeug" },
 ]
 
 [package.metadata]
@@ -722,6 +723,7 @@ requires-dist = [
     { name = "schedule", specifier = ">=1.2.2" },
     { name = "selenium", specifier = ">=4.25.0" },
     { name = "trafilatura", specifier = ">=1.12.2" },
+    { name = "werkzeug" },
 ]
 
 [[package]]
