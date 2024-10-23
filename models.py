@@ -1,28 +1,29 @@
-from app import db
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
+
+db = SQLAlchemy()
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256))
-    casinos = db.relationship('Casino', backref='user', lazy='dynamic')
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    password_hash = db.Column(db.String(256), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+    last_login = db.Column(db.DateTime)
+    is_active = db.Column(db.Boolean, default=True)
+    casinos = db.relationship('Casino', backref='user', lazy=True)
+    accounts = db.relationship('Account', backref='user', lazy=True)
 
 class Casino(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    last_collection = db.Column(db.DateTime, default=datetime.utcnow)
-    next_collection = db.Column(db.DateTime)
-    collection_interval = db.Column(db.Integer, default=24)  # in hours
+    website = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    def update_next_collection(self):
-        self.next_collection = self.last_collection + timedelta(hours=self.collection_interval)
+class Account(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False)
+    casino_id = db.Column(db.Integer, db.ForeignKey('casino.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    casino = db.relationship('Casino', backref='accounts')
+    coins = db.Column(db.Integer, default=0)

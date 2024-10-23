@@ -19,6 +19,34 @@ args = "Run Flask App"
 task = "workflow.run"
 args = "Run Social Casino Bot"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Check Schema"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Check User Table"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Check User Schema"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Check Flask App Status"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Check User Schema Status"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Create Migration"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Apply Migration"
+
 [[workflows.workflow]]
 name = "Run Flask App"
 author = "agent"
@@ -41,6 +69,84 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python main.py"
+
+[[workflows.workflow]]
+name = "Check Schema"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python check_schema.py"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Check User Table"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -c \"from app import app, db; from models import User; with app.app_context(): print([column.name for column in User.__table__.columns])\""
+
+[[workflows.workflow]]
+name = "Check User Schema"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python check_user_schema.py"
+
+[[workflows.workflow]]
+name = "Check Flask App Status"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cat /home/runner/workspace/.replit/logs/Run Flask App.log | tail -n 20"
+
+[[workflows.workflow]]
+name = "Check User Schema Status"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cat /home/runner/workspace/.replit/logs/Check User Schema.log | tail -n 20"
+
+[[workflows.workflow]]
+name = "Create Migration"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "flask db migrate -m 'Update password hash length'"
+
+[[workflows.workflow]]
+name = "Apply Migration"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "flask db upgrade"
 
 [deployment]
 run = ["sh", "-c", "python app.py"]
