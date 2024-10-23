@@ -19,4 +19,7 @@ dependencies = [
     "requests>=2.32.3",
     "werkzeug",
     "flask-migrate>=4.0.7",
+    "gunicorn>=23.0.0",
+    "gevent>=24.10.3",
+    "psutil>=6.1.0",
 ]

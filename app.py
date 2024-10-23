@@ -125,7 +125,7 @@ def claim_coins(account_id):
     
     success = coin_claimer.claim_coins(account_id)
     if success:
-        account.coins += 100  # Assume 100 coins are claimed each time
+        account.coins += 100
         db.session.commit()
         return jsonify({"success": True, "message": "Coins claimed successfully"})
     return jsonify({"success": False, "message": "Failed to claim coins"}), 500
@@ -166,4 +166,10 @@ def api_accounts():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    
+    if os.environ.get('FLASK_ENV') == 'production':
+        from load_balancer import LoadBalancer
+        load_balancer = LoadBalancer(app)
+        load_balancer.start()
+    else:
+        app.run(host='0.0.0.0', port=5000, debug=True)
