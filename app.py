@@ -4,7 +4,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 import os
 from coin_claimer import CoinClaimer
 from analytics import Analytics
@@ -35,7 +35,16 @@ class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
     submit = SubmitField('Register')
+
+    def validate_username(self, field):
+        if User.query.filter_by(username=field.data).first():
+            raise ValidationError('Username already exists.')
+
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError('Email already registered.')
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -47,16 +56,21 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    
     form = RegistrationForm()
     if form.validate_on_submit():
-        username = form.username.data
-        email = form.email.data
-        password = form.password.data
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(username=form.username.data).first()
         if user:
             flash('Username already exists', 'danger')
             return redirect(url_for('register'))
-        new_user = User(username=username, email=email, password=generate_password_hash(password, method='sha256'))
+        
+        new_user = User(
+            username=form.username.data,
+            email=form.email.data,
+            password_hash=generate_password_hash(form.password.data, method='sha256')
+        )
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful. Please log in.', 'success')
@@ -65,22 +79,25 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    
     form = LoginForm()
     if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and check_password_hash(user.password_hash, form.password.data):
             login_user(user)
-            return jsonify({"success": True, "message": "Logged in successfully"})
-        return jsonify({"success": False, "message": "Invalid username or password"}), 401
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('dashboard'))
+        flash('Invalid username or password', 'danger')
     return render_template('login.html', form=form)
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return jsonify({"success": True, "message": "Logged out successfully"})
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('index'))
 
 @app.route('/dashboard')
 @login_required
@@ -121,7 +138,7 @@ def add_account():
 def claim_coins(account_id):
     account = Account.query.get_or_404(account_id)
     if account.user_id != current_user.id:
-        return jsonify({"success": False, "message": "You are not authorized to claim coins for this account"}), 403
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
     
     success = coin_claimer.claim_coins(account_id)
     if success:
@@ -142,26 +159,14 @@ def analytics_dashboard():
     last_7d_coins = analytics.get_total_coins_claimed(current_user.id, timedelta(days=7))
     last_30d_coins = analytics.get_total_coins_claimed(current_user.id, timedelta(days=30))
 
-    return render_template('analytics.html', 
-                           total_coins=total_coins,
-                           success_rate=success_rate,
-                           coins_by_casino=coins_by_casino,
-                           claim_history=claim_history,
-                           last_24h_coins=last_24h_coins,
-                           last_7d_coins=last_7d_coins,
-                           last_30d_coins=last_30d_coins)
-
-@app.route('/api/casinos')
-@login_required
-def api_casinos():
-    casinos = Casino.query.filter_by(user_id=current_user.id).all()
-    return jsonify([{"id": casino.id, "name": casino.name, "website": casino.website} for casino in casinos])
-
-@app.route('/api/accounts')
-@login_required
-def api_accounts():
-    accounts = Account.query.filter_by(user_id=current_user.id).all()
-    return jsonify([{"id": account.id, "username": account.username, "casino": account.casino.name, "coins": account.coins} for account in accounts])
+    return render_template('analytics.html',
+                        total_coins=total_coins,
+                        success_rate=success_rate,
+                        coins_by_casino=coins_by_casino,
+                        claim_history=claim_history,
+                        last_24h_coins=last_24h_coins,
+                        last_7d_coins=last_7d_coins,
+                        last_30d_coins=last_30d_coins)
 
 if __name__ == '__main__':
     with app.app_context():

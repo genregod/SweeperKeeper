@@ -51,6 +51,10 @@ args = "Apply Migration"
 task = "workflow.run"
 args = "Production Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Flask Server"
+
 [[workflows.workflow]]
 name = "Run Flask App"
 author = "agent"
@@ -162,6 +166,18 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "FLASK_ENV=production python manage.py runserver --port 5000"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Flask Server"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python app.py"
 waitForPort = 5000
 
 [deployment]
