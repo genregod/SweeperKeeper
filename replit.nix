@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
+    pkgs.jq
     pkgs.libev
     pkgs.python-launcher
     pkgs.geckodriver
