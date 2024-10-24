@@ -6,11 +6,19 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 import os
+import logging
 from coin_claimer import CoinClaimer
 from analytics import Analytics
 from datetime import timedelta
 from flask_migrate import Migrate
 from models import db, User, Casino, Account
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', 'default_secret_key')
@@ -56,25 +64,41 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    logger.debug('Registration endpoint accessed')
+    
     if current_user.is_authenticated:
+        logger.debug('Authenticated user attempted to access registration page')
         return redirect(url_for('dashboard'))
     
     form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user:
-            flash('Username already exists', 'danger')
-            return redirect(url_for('register'))
+    if request.method == 'POST':
+        logger.debug('Registration form submitted')
         
-        new_user = User(
-            username=form.username.data,
-            email=form.email.data,
-            password_hash=generate_password_hash(form.password.data, method='sha256')
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Registration successful. Please log in.', 'success')
-        return redirect(url_for('login'))
+        if form.validate_on_submit():
+            logger.debug('Form validation successful')
+            try:
+                new_user = User(
+                    username=form.username.data,
+                    email=form.email.data,
+                    password_hash=generate_password_hash(form.password.data, method='sha256')
+                )
+                db.session.add(new_user)
+                db.session.commit()
+                logger.info(f'New user registered successfully: {form.username.data}')
+                flash('Registration successful! Please log in.', 'success')
+                return redirect(url_for('login'))
+            
+            except Exception as e:
+                logger.error(f'Error during user registration: {str(e)}')
+                db.session.rollback()
+                flash('An error occurred during registration. Please try again.', 'danger')
+                return render_template('register.html', form=form)
+        else:
+            logger.debug('Form validation failed')
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f'{field}: {error}', 'danger')
+    
     return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
