@@ -4,23 +4,50 @@
 
 {% block content %}
 <h2>Register</h2>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 <form method="POST">
     {{ form.hidden_tag() }}
     <div class="form-group">
         {{ form.username.label }}
         {{ form.username(class="form-control") }}
+        {% if form.username.errors %}
+            {% for error in form.username.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        {% endif %}
     </div>
     <div class="form-group">
         {{ form.email.label }}
         {{ form.email(class="form-control") }}
+        {% if form.email.errors %}
+            {% for error in form.email.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        {% endif %}
     </div>
     <div class="form-group">
         {{ form.password.label }}
         {{ form.password(class="form-control") }}
+        {% if form.password.errors %}
+            {% for error in form.password.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        {% endif %}
     </div>
     <div class="form-group">
         {{ form.confirm_password.label }}
         {{ form.confirm_password(class="form-control") }}
+        {% if form.confirm_password.errors %}
+            {% for error in form.confirm_password.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        {% endif %}
     </div>
     {{ form.submit(class="btn btn-primary") }}
 </form>
